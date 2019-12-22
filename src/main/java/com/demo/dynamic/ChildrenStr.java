@@ -1,8 +1,6 @@
 package com.demo.dynamic;
 
 
-import java.util.Stack;
-
 import static java.lang.Math.max;
 
 /**
@@ -13,27 +11,20 @@ public class ChildrenStr {
     private static int[][] arr;
     private static int[] X;
     private static int[] Y;
-    private static int num;
 
     public static void main(String[] args) {
-
-        X = new int[]{1, 2, 3, 2, 4, 1, 2};
-        Y = new int[]{2, 4, 3};
-        int len = childrenStr(0, X.length, 0, Y.length);
-        System.out.println(len);
-
+        X = new int[]{5, 3, 2, 2, 3};
+        Y = new int[]{5, 2, 3, 2, 3};
         arr = new int[X.length + 1][Y.length + 1];
-//        num = childrenStr(X.length, Y.length);
-        System.out.println(num);
-        for (int i = 0; i < X.length; i++) {
-            for (int j = 0; j < Y.length; j++) {
-                System.out.print(arr[i][j] + ", ");
+        int num = childrenStrPlanDown(X, X.length, Y, Y.length);
+        for (int i = 0; i <= X.length; i++) {
+            for (int j = 0; j <= Y.length; j++) {
+                System.out.print(arr[i][j] + " ");
             }
             System.out.println();
         }
-//        StringBuilder sb = new StringBuilder();
-        Stack<Integer> sb = new Stack<>();
-        LHS(X.length - 1, Y.length - 1, sb);
+//        LHS(X.length, Y.length, "", num);
+        LHSOne(X.length, Y.length, new StringBuilder(), num);
     }
 
     /**
@@ -53,41 +44,6 @@ public class ChildrenStr {
         } else {
             return max(childrenStr(i + 1, m, j, n), childrenStr(i, m, j + 1, n));
         }
-    }
-
-    /**
-     * 动态规划求解最长子序列长度..
-     *
-     * @param m 字符串长度.
-     * @param n 字符串长度.
-     */
-    private static void childrenStr(int m, int n) {
-        int[] X = {1, 2, 3, 5, 3, 7, 5, 3};
-        int[] Y = {2, 4, 3, 3, 5, 7, 5};
-//        int lenDown = childrenStrDown(X, 0, X.length, Y, 0, Y.length);
-//        System.out.println("lenDown: " + lenDown);
-//        int lenUp = childrenStrUp(X, X.length - 1, Y, Y.length - 1);
-//        System.out.println("lenUp: " + lenUp);
-
-        arr = new int[X.length + 1][Y.length + 1];
-////        int num = childrenStr(X, X.length, Y, Y.length);
-////        System.out.println(num);
-////        for (int i = 0; i < X.length; i++) {
-////            for (int j = 0; j < Y.length; j++) {
-////                System.out.print(arr[i][j] + ", ");
-////            }
-////            System.out.println();
-////        }
-        int numDown = childrenStrPlanDown(X, X.length, Y, Y.length);
-        System.out.println("numDown: " + numDown);
-        for (int i = 1; i <= X.length; i++) {
-            for (int j = 1; j <= Y.length; j++) {
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.println();
-        }
-
-        getStr(X, Y);
     }
 
     // 最长公共子序列.
@@ -137,27 +93,50 @@ public class ChildrenStr {
      * @param m 字符串长度.
      * @param n 字符串长度.
      */
-    public static void LHS(int m, int n, Stack<Integer> sb) {
+    public static void LHS(int m, int n, String sb, int i) {
 
-        Stack<Integer> stringBuilder = sb;
-        if (num == 0) {
-            while (!sb.isEmpty()) {
-                System.out.println(sb.peek());
-            }
-            sb.pop();
+        if (i == 0) {
+            StringBuilder stringBuilder = new StringBuilder(sb);
+            System.out.println(stringBuilder.reverse().toString());
             return;
         }
-        if (X[m] == Y[n]) {
-            num--;
-            stringBuilder.push(X[m]);
-            LHS(m - 1, n - 1, stringBuilder);
+        if (X[m - 1] == Y[n - 1]) {
+            int num = i - 1;
+            sb += String.valueOf(X[m - 1]);
+            LHS(m - 1, n - 1, sb, num);
         } else if (arr[m - 1][n] > arr[m][n - 1]) {
-            LHS(m - 1, n, stringBuilder);
+            LHS(m - 1, n, sb, i);
         } else if (arr[m][n - 1] > arr[m - 1][n]) {
-            LHS(m, n - 1, stringBuilder);
+            LHS(m, n - 1, sb, i);
         } else {
-            LHS(m - 1, n, stringBuilder);
-            LHS(m, n - 1, stringBuilder);
+            LHS(m - 1, n, sb, i);
+            LHS(m, n - 1, sb, i);
+        }
+    }
+
+    /**
+     * 获取所有最长子序列.
+     *
+     * @param m 字符串长度.
+     * @param n 字符串长度.
+     */
+    public static void LHSOne(int m, int n, StringBuilder sb, int i) {
+
+        if (i == 0) {
+            System.out.println(sb.reverse().toString());
+            return;
+        }
+        if (X[m - 1] == Y[n - 1]) {
+            int num = i - 1;
+            StringBuilder sbOn = sb.append(X[m - 1]);
+            LHSOne(m - 1, n - 1, sbOn, num);
+        } else if (arr[m - 1][n] > arr[m][n - 1]) {
+            LHSOne(m - 1, n, sb, i);
+        } else if (arr[m][n - 1] > arr[m - 1][n]) {
+            LHSOne(m, n - 1, sb, i);
+        } else {
+            LHSOne(m - 1, n, sb, i);
+            LHSOne(m, n - 1, sb, i);
         }
     }
 
